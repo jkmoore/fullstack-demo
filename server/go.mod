@@ -1,3 +1,3 @@
-module github.com/jkmoore/webpack-demo
+module github.com/jkmoore/fullstack-demo
 
 go 1.24.3

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App() {
-  const [message, setMessage] = useState("Loading...");
+  const [message, setMessage] = useState<string>("Loading...");
 
   useEffect(() => {
     fetch("http://localhost:8080/")

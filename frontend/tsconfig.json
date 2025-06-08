@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                        // Use modern JavaScript features
+    "module": "ESNext",                     // For bundlers like Vite/Webpack
+    "jsx": "react-jsx",                     // JSX transform for React 17+
+    "strict": true,                         // Enable all strict type-checking options
+    "moduleResolution": "node",            // Resolves node_modules the Node.js way
+    "esModuleInterop": true,               // Allow default imports from CommonJS
+    "forceConsistentCasingInFileNames": true, // Avoid case-sensitive file name bugs
+    "skipLibCheck": true,                  // Speeds up compilation by skipping type checks on .d.ts files
+    "allowSyntheticDefaultImports": true   // Support `import React from 'react'`
+  },
+  "include": ["src"],                      // Include everything in the `src/` folder
+  "exclude": ["node_modules", "dist"]      // Exclude dependencies and build output
+}

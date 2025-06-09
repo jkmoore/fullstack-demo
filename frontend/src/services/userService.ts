@@ -21,3 +21,12 @@ export async function addUser(name: string): Promise<User> {
   }
   return res.json();
 }
+
+export async function deleteUser(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    throw new Error("Failed to delete user");
+  }
+}

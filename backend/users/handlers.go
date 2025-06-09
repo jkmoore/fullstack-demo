@@ -3,6 +3,8 @@ package users
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 var users = []User{}
@@ -11,7 +13,7 @@ var nextID = 0
 func setCORSHeaders(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 }
 
 func setJSONHeaders(w http.ResponseWriter) {
@@ -45,4 +47,26 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	users = append(users, user)
 
 	json.NewEncoder(w).Encode(user)
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	setCORSHeaders(w)
+	setJSONHeaders(w)
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || idStr == "" {
+		http.Error(w, "Invalid or missing user id", http.StatusBadRequest)
+		return
+	}
+
+	for i, user := range users {
+		if user.ID == id {
+			users = append(users[:i], users[i+1:]...)
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+	}
+
+	http.Error(w, "User not found", http.StatusNotFound)
 }

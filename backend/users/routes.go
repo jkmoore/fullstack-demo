@@ -17,4 +17,14 @@ func RegisterRoutes(mux *http.ServeMux) {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	mux.HandleFunc("/users/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodDelete:
+			DeleteUser(w, r)
+		case http.MethodOptions:
+			HandleOptions(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 }

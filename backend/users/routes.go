@@ -21,6 +21,8 @@ func RegisterRoutes(mux *http.ServeMux) {
 		switch r.Method {
 		case http.MethodDelete:
 			DeleteUser(w, r)
+		case http.MethodPatch:
+			PatchUser(w, r)
 		case http.MethodOptions:
 			HandleOptions(w, r)
 		default:

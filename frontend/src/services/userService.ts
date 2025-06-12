@@ -30,3 +30,16 @@ export async function deleteUser(id: number): Promise<void> {
     throw new Error("Failed to delete user");
   }
 }
+
+export async function updateUser(id: number, name: string) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Failed to update user");
+  }
+  return res.json();
+}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { User } from "./types/user";
 import UserList from "./components/UserList";
 import UserForm from "./components/UserForm";
-import { fetchUsers, addUser, deleteUser } from "./services/userService";
+import { fetchUsers, addUser, deleteUser, updateUser } from "./services/userService";
 
 export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,9 +33,21 @@ export default function App() {
     return <div>Loading...</div>;
   }
 
+  const handleUpdateUser = (id: number, name: string) => {
+    updateUser(id, name)
+    .then((updatedUser) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === id ? updatedUser : user
+        )
+      );
+    })
+    .catch(console.error);
+  };
+
   return (
     <div>
-      <UserList users={users} onDeleteUser={handleDeleteUser} />
+      <UserList users={users} onDeleteUser={handleDeleteUser} onUpdateUser={handleUpdateUser} />
       <UserForm onAddUser={handleAddUser} />
     </div>
   );

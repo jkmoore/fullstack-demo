@@ -9,14 +9,18 @@ module.exports = {
     publicPath: "/"
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"]
+    extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      react: path.resolve(__dirname, "node_modules/react"),
+      'react-dom': path.resolve(__dirname, "node_modules/react-dom")
+    }
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: "ts-loader",
-        exclude: /node_modules/
+        test: /\.[jt]sx?$/,
+        exclude: /node_modules/,
+        use: "babel-loader"
       }
     ]
   },

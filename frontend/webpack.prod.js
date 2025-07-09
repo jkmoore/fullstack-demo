@@ -6,7 +6,7 @@ module.exports = merge(common, {
   output: {
     filename: "bundle.[contenthash].js",
   },
-  devtool: false,
+  devtool: "source-map",
   optimization: {
     minimize: true,
   }

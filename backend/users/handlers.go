@@ -7,9 +7,6 @@ import (
 	"strings"
 )
 
-var users = []User{}
-var nextID = 0
-
 func setCORSHeaders(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -25,13 +22,20 @@ func HandleOptions(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	setCORSHeaders(w)
 	setJSONHeaders(w)
+
+	users, err := repo.GetAll()
+	if err != nil {
+		http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
+		return
+	}
+
 	json.NewEncoder(w).Encode(users)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	setCORSHeaders(w)
 	setJSONHeaders(w)
 
@@ -42,41 +46,42 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.ID = nextID
-	nextID++
-	users = append(users, user)
+	id, err := repo.Create(user.Name)
+	if err != nil {
+		http.Error(w, "Failed to create user", http.StatusInternalServerError)
+		return
+	}
 
+	user.ID = id
 	json.NewEncoder(w).Encode(user)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	setCORSHeaders(w)
 	setJSONHeaders(w)
 
 	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || idStr == "" {
 		http.Error(w, "Invalid or missing user id", http.StatusBadRequest)
 		return
 	}
 
-	for i, user := range users {
-		if user.ID == id {
-			users = append(users[:i], users[i+1:]...)
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
+	err = repo.Delete(id)
+	if err != nil {
+		http.Error(w, "User not found or failed to delete", http.StatusNotFound)
+		return
 	}
 
-	http.Error(w, "User not found", http.StatusNotFound)
+	w.WriteHeader(http.StatusNoContent)
 }
 
-func PatchUser(w http.ResponseWriter, r *http.Request) {
+func PatchUser(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	setCORSHeaders(w)
 	setJSONHeaders(w)
 
 	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || idStr == "" {
 		http.Error(w, "Invalid or missing user id", http.StatusBadRequest)
 		return
@@ -89,15 +94,11 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i, user := range users {
-		if user.ID == id {
-			if updates.Name != "" {
-				users[i].Name = updates.Name
-			}
-			json.NewEncoder(w).Encode(users[i])
-			return
-		}
+	updatedUser, err := repo.Update(User{ID: id, Name: updates.Name})
+	if err != nil {
+		http.Error(w, "User not found or failed to update", http.StatusNotFound)
+		return
 	}
 
-	http.Error(w, "User not found", http.StatusNotFound)
+	json.NewEncoder(w).Encode(updatedUser)
 }

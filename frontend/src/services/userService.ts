@@ -10,6 +10,15 @@ export async function fetchUsers(): Promise<User[]> {
   return res.json();
 }
 
+export async function fetchUserByID(id: number): Promise<User> {
+  const res = await fetch(`${BASE_URL}/${id}`)
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Failed to fetch user");
+  }
+  return res.json();
+}
+
 export async function addUser(name: string): Promise<User> {
   const res = await fetch(BASE_URL, {
     method: "POST",

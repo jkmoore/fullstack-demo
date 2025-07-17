@@ -35,6 +35,25 @@ func GetUsers(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	json.NewEncoder(w).Encode(users)
 }
 
+func GetUserByID(w http.ResponseWriter, r *http.Request, repo *Repository) {
+	setCORSHeaders(w)
+	setJSONHeaders(w)
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || idStr == "" {
+		http.Error(w, "Invalid or missing user id", http.StatusBadRequest)
+		return
+	}
+
+	user, err := repo.GetByID(id)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+	}
+
+	json.NewEncoder(w).Encode(user)
+}
+
 func CreateUser(w http.ResponseWriter, r *http.Request, repo *Repository) {
 	setCORSHeaders(w)
 	setJSONHeaders(w)

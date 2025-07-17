@@ -13,6 +13,18 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
+func (r *Repository) GetByID(id int64) (User, error) {
+	var u User
+	err := r.db.QueryRow("SELECT id, name FROM users WHERE id = ?", id).Scan(&u.ID, &u.Name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return User{}, errors.New("user not found")
+		}
+		return User{}, err
+	}
+	return u, nil
+}
+
 func (r *Repository) GetAll() ([]User, error) {
 	rows, err := r.db.Query("SELECT id, name FROM users")
 	if err != nil {
